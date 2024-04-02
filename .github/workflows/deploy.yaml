@@ -16,16 +16,16 @@ jobs:
       - run: docker run -e CI=true lionelherrerobattista/react-test npm test
 
       # create images
-      # - run: docker build -t lionelherrerobattista/multi-client-10-14 ./client
-      # - run: docker build -t lionelherrerobattista/multi-nginx-10-14 ./nginx
-      # - run: docker build -t lionelherrerobattista/multi-server-10-14 ./server
-      # - run: docker build -t lionelherrerobattista/multi-worker-10-14 ./worker
+      - run: docker build -t lionelherrerobattista/multi-client-10-14 ./client
+      - run: docker build -t lionelherrerobattista/multi-nginx-10-14 ./nginx
+      - run: docker build -t lionelherrerobattista/multi-server-10-14 ./server
+      - run: docker build -t lionelherrerobattista/multi-worker-10-14 ./worker
 
       # # push to docker hub
-      # - run: docker push lionelherrerobattista/multi-client-10-14
-      # - run: docker push lionelherrerobattista/multi-nginx-10-14
-      # - run: docker push lionelherrerobattista/multi-server-10-14
-      # - run: docker push lionelherrerobattista/multi-worker-10-14
+      - run: docker push lionelherrerobattista/multi-client-10-14
+      - run: docker push lionelherrerobattista/multi-nginx-10-14
+      - run: docker push lionelherrerobattista/multi-server-10-14
+      - run: docker push lionelherrerobattista/multi-worker-10-14
 
       # - name: Generate deployment package
       #   run: zip -r deploy.zip . -x "*.git*"
