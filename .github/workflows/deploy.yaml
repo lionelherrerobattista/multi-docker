@@ -1,0 +1,43 @@
+name: Deploy MultiDocker
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      
+      # run tests:
+      - run: docker build -t lionelherrerobattista/react-test -f ./client/Dockerfile.dev ./client
+      - run: docker run -e CI=true lionelherrerobattista/react-test npm test
+
+      # create images
+      - run: docker build -t lionelherrerobattista/multi-client-10-14 ./client
+      - run: docker build -t lionelherrerobattista/multi-nginx-10-14 ./nginx
+      - run: docker build -t lionelherrerobattista/multi-server-10-14 ./server
+      - run: docker build -t lionelherrerobattista/multi-worker-10-14 ./worker
+
+      # push to docker hub
+      - run: docker push lionelherrerobattista/multi-client-10-14
+      - run: docker push lionelherrerobattista/multi-nginx-10-14
+      - run: docker push lionelherrerobattista/multi-server-10-14
+      - run: docker push lionelherrerobattista/multi-worker-10-14
+
+      - name: Generate deployment package
+        run: zip -r deploy.zip . -x "*.git*"
+
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v18
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
+          application_name: multi-gh
+          environment_name: Multigh-env
+          existing_bucket_name: 
+          region: us-east-1
+          version_label: ${{ github.sha }}
+          deployment_package: deploy.zip
